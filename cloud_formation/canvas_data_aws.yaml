@@ -7,12 +7,12 @@ Description:
 Parameters:
   EnvironmentParameter:
     Type: String
-    Default: prod
+    Default: dev
     Description: The environment name.
     AllowedValues: [dev, qa, prod]
   LambdaFunctionZipFileKeyParameter:
     Type: String
-    Default: "canvas-data-aws/canvas-data-lambda-05272019-173758.zip"
+    Default: "canvas-data-2-aws/canvas-data-2-lambda-05272019-173758.zip"
     Description: The S3 key (file path) where the Lambda function package zip file is stored. If you've packaged your own version of the functions, replace this with your own zip file.
   LambdaFunctionBucketParameter:
     Type: String
@@ -45,7 +45,7 @@ Resources:
     Properties:
       BucketName: !Join
         - "-"
-        - - "canvas-data-warehouse"
+        - - "canvas-data-2-warehouse"
           - !Ref AWS::AccountId
           - !Ref EnvironmentParameter
       PublicAccessBlockConfiguration:
@@ -80,7 +80,7 @@ Resources:
   FetchLambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join ["-", ["canvas-data-fetch-lambda-role", !Ref EnvironmentParameter]]
+      RoleName: !Join ["-", ["canvas-data-2-fetch-lambda-role", !Ref EnvironmentParameter]]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -94,7 +94,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: !Join ["-", ["canvas-data-fetch-lambda-policy", !Ref EnvironmentParameter]]
+        - PolicyName: !Join ["-", ["canvas-data-2-fetch-lambda-policy", !Ref EnvironmentParameter]]
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -115,8 +115,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: "Lambda function that fetches a file from a URL and stores it in an S3 bucket"
-      FunctionName: !Join ["-", ["canvas-data-fetch", !Ref EnvironmentParameter]]
-      Handler: "fetch-canvas-data-file.lambda_handler"
+      FunctionName: !Join ["-", ["canvas-data-2-fetch", !Ref EnvironmentParameter]]
+      Handler: "fetch-canvas-data-2-file.lambda_handler"
       Role: !GetAtt FetchLambdaFunctionRole.Arn
       Runtime: "python3.7"
       Environment:
@@ -131,7 +131,7 @@ Resources:
   SyncLambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join ["-", ["canvas-data-sync-lambda-role", !Ref EnvironmentParameter]]
+      RoleName: !Join ["-", ["canvas-data-2-sync-lambda-role", !Ref EnvironmentParameter]]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -145,7 +145,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: !Join ["-", ["uw-canvas-data-sync-lambda-policy", !Ref EnvironmentParameter]]
+        - PolicyName: !Join ["-", ["uw-canvas-data-2-sync-lambda-policy", !Ref EnvironmentParameter]]
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -211,8 +211,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: "Lambda function that synchronizes Canvas Data files with a local archive"
-      FunctionName: !Join ["-", ["canvas-data-sync", !Ref EnvironmentParameter]]
-      Handler: "sync-canvas-data-files.lambda_handler"
+      FunctionName: !Join ["-", ["canvas-data-2-sync", !Ref EnvironmentParameter]]
+      Handler: "sync-canvas-data-2-files.lambda_handler"
       Role: !GetAtt SyncLambdaFunctionRole.Arn
       Runtime: "python3.7"
       Environment:
@@ -235,11 +235,11 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: runs every day at 10am UTC
-      Name: !Join ["-", ["canvas-data-sync-schedule", !Ref EnvironmentParameter]]
+      Name: !Join ["-", ["canvas-data-2-sync-schedule", !Ref EnvironmentParameter]]
       ScheduleExpression: "cron(0 10 * * ? *)"
       Targets:
         - Arn: !GetAtt SyncLambdaFunction.Arn
-          Id: !Join ["-", ["canvas-data-sync-sched-target", !Ref EnvironmentParameter]]
+          Id: !Join ["-", ["canvas-data-2-sync-sched-target", !Ref EnvironmentParameter]]
 
   SyncLambdaFuctionPermission:
     Type: AWS::Lambda::Permission
