@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TS=$(date +"canvas-data-lambda-%m%d%Y-%H%M%S.zip")
+TS=$(date +"canvas-data-2-lambda-%m%d%Y-%H%M%S.zip")
 
 echo "Building $TS"
 
